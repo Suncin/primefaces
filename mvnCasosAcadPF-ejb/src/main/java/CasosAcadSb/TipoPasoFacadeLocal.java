@@ -1,0 +1,34 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package CasosAcadSb;
+
+import java.util.List;
+import javax.ejb.Local;
+import tpi.casosacadpf.libreriamavencasosacadpf.TipoPaso;
+
+/**
+ *
+ * @author debian
+ */
+@Local
+public interface TipoPasoFacadeLocal {
+boolean create(TipoPaso tipoPaso);
+
+    //void edit(TipoPaso tipoPaso);
+
+   boolean editar(TipoPaso tipoPaso);
+    
+    boolean remove(TipoPaso tipoPaso);
+
+    TipoPaso find(Object id);
+
+    List<TipoPaso> findAll();
+
+    List<TipoPaso> findRange(int[] range);
+
+    int count();
+    
+}

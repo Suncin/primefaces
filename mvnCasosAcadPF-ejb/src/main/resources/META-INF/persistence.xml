@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="tpi_CasosAcadPF_mvnCasosAcadPF-ejb_ejb_1.0-SNAPSHOTPU" transaction-type="JTA">
+    <jta-data-source>jdbc/CasosAcadResource</jta-data-source>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.Caso</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.CasoDetalle</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.CasoDetalleRequisito</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.CasoDetalleRequisitoAtestado</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.Paso</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.PasoRequisito</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.Proceso</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.ProcesoDetalle</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.Requisito</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.Solicitud</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.TipoPaso</class>
+    <class>tpi.casosacadpf.libreriamavencasosacadpf.TipoRequisito</class>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <properties/>
+  </persistence-unit>
+</persistence>

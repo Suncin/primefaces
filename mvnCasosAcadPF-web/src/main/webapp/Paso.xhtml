@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <p:panel header="Pasos para Casos Academicos" closable="false" toggleable="false" >
+            <h:panelGrid>
+                <h:form id="tablaPaso">
+                    <p:dataTable value="#{frmPaso.modeloPaso}"
+                                 var="p"
+                                 rows="10"
+                                 paginator="true"
+                                 lazy="true"
+                                 selectionMode="single"
+                                 selection="#{frmPaso.registro}"
+                                 style="color: #ff5252"
+                                 >
+                        <p:column headerText="ID">
+                            <p:outputLabel value="#{p.idPaso}"></p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Tipo Paso">
+                            <p:outputLabel value="#{p.idTipoPaso.paso}"></p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Paso">
+                            <p:outputLabel value="#{p.paso}"></p:outputLabel>
+                        </p:column>
+                                     
+                      <p:ajax update=":tabViewPaso" event="rowSelect"></p:ajax> 
+                    </p:dataTable>    
+                    <p:growl id="growl" life="2000" />
+                </h:form>
+            </h:panelGrid>
+        </p:panel>
+        
+        <div>
+            <p:tabView id="tabViewPaso">
+                <p:tab title="Formulario Paso" id="tabPaso">
+                    <h:form id="edAddPaso">
+                        <p:panelGrid columns="2">
+                            <p:outputLabel value="ID Paso" for="txtIdPaso" id="lblIdPaso"></p:outputLabel>
+                            <p:inputText id="txtIdPaso" value="#{frmPaso.registro.idPaso}" readonly="true"></p:inputText>
+                            <p:outputLabel value="Tipo Paso" for="cbTipoPaso" id="lblTipoPaso"></p:outputLabel>
+                            <h:selectOneListbox id="cbTipoPaso" value="#{frmPaso.tipoSeleccionado}" 
+                                                style="width: 200px" required="true" styleClass="center_content" size="1" >
+                                <f:selectItem itemLabel="Seleccione Tipo" itemValue="" />
+                                <f:selectItems value="#{frmPaso.tipos}" 
+                                               var="tipo" 
+                                               itemLabel="#{tipo.paso}" 
+                                               itemValue="#{tipo.idTipoPaso}">
+                                </f:selectItems>
+                            </h:selectOneListbox>
+                            <p:outputLabel value="Nombre" for="txtNombreP" id="lblNombreP"></p:outputLabel>
+                            <p:inputText id="txtNombreP" value="#{frmPaso.registro.paso}" required="true"></p:inputText>
+                            
+                            <p:commandButton value="Nuevo" >    
+                            </p:commandButton>
+                            <p:commandButton value="Modificar" actionListener="#{frmPaso.btnModificarAction}" update=":tablaPaso" ></p:commandButton>                
+                            <p:commandButton value="Guardar" actionListener="#{frmPaso.btnGuardarAction}" update=":tablaPaso"></p:commandButton> 
+                            <p:commandButton value="Eliminar" actionListener="#{frmPaso.btnEliminarAction}" update=":tablaPaso"></p:commandButton>          
+                        </p:panelGrid>       
+                    </h:form>
+                </p:tab>
+                <p:tab title="Tabla Tipo Paso" id="tabTipoPaso">
+                      <h:panelGrid>
+                <h:form id="tablaTipoPaso">
+                    <p:dataTable value="#{frmTipoPaso.modelo}"
+                                 var="tipo"
+                                 rows="10"
+                                 paginator="true"
+                                 lazy="true"
+                                 selectionMode="single"
+                                 selection="#{frmTipoPaso.registro}"
+                                 style="color: #ff5252"
+                                 >
+                        <p:column headerText="ID">
+                            <p:outputLabel value="#{tipo.idTipoPaso}"></p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Nombre">
+                            <p:outputLabel value="#{tipo.paso}"></p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Estado">
+                            <p:outputLabel value="#{tipo.activo?'Activo':'Inactivo'}"></p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Observacion">
+                            <p:outputLabel value="#{tipo.observacion}"></p:outputLabel>
+                        </p:column>                        
+                    </p:dataTable>                        
+                </h:form>
+            </h:panelGrid>
+                </p:tab>
+            </p:tabView>    
+        </div>
+        
+    </h:body>
+</html>
+
