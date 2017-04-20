@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -17,6 +19,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import tpi.casosacadpf.libreriamavencasosacadpf.TipoPaso;
@@ -28,18 +31,19 @@ import tpi.casosacadpf.libreriamavencasosacadpf.TipoPaso;
 @Named(value = "frmTipoPaso")
 @ViewScoped
 public class frmTipoPaso implements Serializable{
-
-   private LazyDataModel<TipoPaso> modelo;
+    
+    private LazyDataModel<TipoPaso> modelo;
    
     @EJB
     private TipoPasoFacadeLocal tpfl;
     
-    private TipoPaso registro = new TipoPaso();
+    private TipoPaso registro;
+    private boolean editar=false;
     
     
     @PostConstruct
     public void init(){
-        //this.registro=new TipoPaso();
+     
         
          setModelo(new LazyDataModel<TipoPaso>(){
 
@@ -95,6 +99,29 @@ public class frmTipoPaso implements Serializable{
         this.registro = registro;
     }
     
+    public void limpiar(){
+    
+        RequestContext.getCurrentInstance().reset(":vistaPaso");
+        this.registro= new TipoPaso();
+        
+    
+    }
+     public void cambioTabla(){
+        this.editar = true;
+    }
+    
+    public void btnNuevoAction(ActionEvent ae){
+     editar=false;
+        try{
+           
+           limpiar();
+       }catch(Exception e){
+       Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
+       }
+        
+    
+    }
+    
     public void btnGuardarAction(ActionEvent ae){
         try {
         //    
@@ -103,11 +130,12 @@ public class frmTipoPaso implements Serializable{
                 boolean resultado = this.tpfl.create(registro);
                 //this.tipo=new TipoRequisito();
                 FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Creado con exito":"Error", null);
-                //this.agregar = !resultado;
+              //  this.editar = !resultado;
                 FacesContext.getCurrentInstance().addMessage(null, msj);
+                limpiar();
             }
         } catch (Exception e) {
-           
+           Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
         }
      
       }
@@ -117,10 +145,11 @@ public class frmTipoPaso implements Serializable{
         try{
             boolean resultado = this.tpfl.editar(registro); 
             FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Modificado con exito":"Error", null);
-            //this.editar = resultado;
+            //this.editar = !resultado;
             FacesContext.getCurrentInstance().addMessage(null, msj);
+            limpiar();
         }catch(Exception e){
-            System.err.println(""+e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
         }
     }
       
@@ -130,8 +159,12 @@ public class frmTipoPaso implements Serializable{
                 boolean resultado = this.tpfl.remove(registro);
                 FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Eliminado con exito":"Error", null);
                 FacesContext.getCurrentInstance().addMessage(null, msj);
+                limpiar();
+                editar=false;
             }
         } catch (Exception e) {
+        Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
+        
         }
     }
     
@@ -140,6 +173,18 @@ public class frmTipoPaso implements Serializable{
      * Creates a new instance of FrmTipoPaso
      */
     public frmTipoPaso() {
+    
+    this.registro= new TipoPaso();
+    
+    }
+
+    public boolean isEditar() {
+        return editar;
+    }
+
+    public void setEditar(boolean editar) {
+        this.editar = editar;
     }
     
 }
+

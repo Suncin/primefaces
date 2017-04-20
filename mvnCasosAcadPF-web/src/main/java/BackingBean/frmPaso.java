@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -19,6 +21,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import tpi.casosacadpf.libreriamavencasosacadpf.Paso;
@@ -32,25 +35,23 @@ import tpi.casosacadpf.libreriamavencasosacadpf.TipoPaso;
 @ViewScoped
 public class frmPaso implements Serializable{
 
-private LazyDataModel<Paso> modeloPaso;
-    private LazyDataModel<TipoPaso> modeloTipo;
-    private Paso registro = new Paso();
-    private TipoPaso tipo;
+ private LazyDataModel<Paso> modeloPaso;
+     
+    private Paso registroP;
     private List<TipoPaso> tipos;
-    
+    private boolean editar= false;
     
     @EJB
     private PasoFacadeLocal pfl;
     @EJB
     private TipoPasoFacadeLocal tpfl;
     
-    
     @PostConstruct
     public void init(){
         
-             this.tipos= tpfl.findAll();
-        
-             setModeloPaso(new LazyDataModel<Paso>(){
+    this.tipos= tpfl.findAll();
+    
+    setModeloPaso(new LazyDataModel<Paso>(){
 
             @Override
             public List<Paso> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
@@ -84,52 +85,13 @@ private LazyDataModel<Paso> modeloPaso;
                 }
                 return null;
             }       
-        });
-
-             
-             setModeloTipo(new LazyDataModel<TipoPaso>(){
-
-            @Override
-            public List<TipoPaso> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-                List salida = new ArrayList();
-                if(tpfl != null){
-                    this.setRowCount(tpfl.count());
-                    int[] rango = new int[2];
-                    rango[0] = first;
-                    rango[1] = pageSize;
-                    salida = tpfl.findRange(rango);
-                }
-                return salida;
-            }
-
-            @Override
-            public Object getRowKey(TipoPaso object) {
-                return object.getIdTipoPaso();
-            }
-
-            @Override
-            public TipoPaso getRowData(String rowKey) {
-                if(this.getWrappedData()!=null){
-                    List<TipoPaso> lista = (List<TipoPaso>) this.getWrappedData();
-                    if(!lista.isEmpty()) {
-                        for(TipoPaso get : lista) {
-                            if(get.getIdTipoPaso().compareTo(Integer.parseInt(rowKey))==0) {
-                                return get;
-                            }
-                        }
-                    }
-                }
-                return null;
-            }       
-        });
-             
-             
+        });            
     }
     
-     public Integer getTipoSeleccionado(){
-     if(registro!= null){
-            if(registro.getIdTipoPaso()!= null){
-                return this.registro.getIdTipoPaso().getIdTipoPaso();
+    public Integer getTipoSeleccionado(){
+     if(registroP!= null){
+            if(registroP.getIdTipoPaso()!= null){
+                return this.registroP.getIdTipoPaso().getIdTipoPaso();
             } else {
                 return null;
             }         
@@ -140,30 +102,52 @@ private LazyDataModel<Paso> modeloPaso;
     
     public void setTipoSeleccionado(Integer idTipo){
         if(idTipo >= 0 && !this.tipos.isEmpty()){
-            for(TipoPaso tp : this.getTipos()) {
-                if(Objects.equals(tp.getIdTipoPaso(), idTipo)) {
-                    if(this.registro.getIdTipoPaso()!= null) {
-                        this.registro.getIdTipoPaso().setIdTipoPaso(idTipo);
+            for(TipoPaso tpe : this.getTipos()) {
+                if(Objects.equals(tpe.getIdTipoPaso(), idTipo)) {
+                    if(this.registroP.getIdTipoPaso() != null) {
+                        this.registroP.getIdTipoPaso().setIdTipoPaso(idTipo);
                     } else {
-                        this.registro.setIdTipoPaso(tp);
+                        this.registroP.setIdTipoPaso(tpe);
                     }
                 }
             }
         }
     
     }
+     public void cambioTabla(){
+        this.editar = true;
+    }
+    
+    public void limpiar(){
+        RequestContext.getCurrentInstance().reset(":tabViewPaso:edAddPaso");
+        this.registroP= new Paso();
+    }
+    
+    public void btnNuevoAction(ActionEvent ae){
+    editar=false;
+      try{
+      
+          limpiar();
+      
+      }catch(Exception e){
+      Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
+      
+      }
+    
+    }
     
     
           public void btnGuardarAction(ActionEvent ae){
         try {    
-            if(this.registro != null && this.pfl != null){
-                boolean resultado = this.pfl.create(registro);
+            if(this.registroP != null && this.pfl != null){
+                boolean resultado = this.pfl.create(registroP);
                 FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Creado con exito":"Error", null);
-                //this.agregar = !resultado;
+                
                 FacesContext.getCurrentInstance().addMessage(null, msj);
+                limpiar();
             }
         } catch (Exception e) {
-           
+           Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
         }
      
       }
@@ -171,32 +155,37 @@ private LazyDataModel<Paso> modeloPaso;
      
       public void btnModificarAction(ActionEvent ae){
         try{
-            boolean resultado = this.pfl.editar(registro); 
+            boolean resultado = this.pfl.editar(registroP); 
             FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Modificado con exito":"Error", null);
-            //this.editar = resultado;
+           
             FacesContext.getCurrentInstance().addMessage(null, msj);
+            limpiar();
         }catch(Exception e){
-            System.err.println(""+e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
         }
     }
 
             public void btnEliminarAction(ActionEvent ae) {
         try {
-            if(this.registro != null && this.pfl != null){
-                boolean resultado = this.pfl.remove(registro);
+            if(this.registroP != null && this.pfl != null){
+                boolean resultado = this.pfl.remove(registroP);
+                editar=!resultado;
                 FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Eliminado con exito":"Error", null);
                 FacesContext.getCurrentInstance().addMessage(null, msj);
+                limpiar();
+                
             }
         } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
         }
     }
 
     
-    
     /**
-     * Creates a new instance of FrmRequisito
+     * Creates a new instance of FrmPaso
      */
     public frmPaso() {
+        this.registroP=new Paso();
     }
 
     public LazyDataModel<Paso> getModeloPaso() {
@@ -206,29 +195,14 @@ private LazyDataModel<Paso> modeloPaso;
     public void setModeloPaso(LazyDataModel<Paso> modeloPaso) {
         this.modeloPaso = modeloPaso;
     }
-
-    public LazyDataModel<TipoPaso> getModeloTipo() {
-        return modeloTipo;
-    }
-
-    public void setModeloTipo(LazyDataModel<TipoPaso> modeloTipo) {
-        this.modeloTipo = modeloTipo;
-    }
+    
 
     public Paso getRegistro() {
-        return registro;
+        return registroP;
     }
 
     public void setRegistro(Paso registro) {
-        this.registro = registro;
-    }
-
-    public TipoPaso getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(TipoPaso tipo) {
-        this.tipo = tipo;
+        this.registroP = registro;
     }
 
     public List<TipoPaso> getTipos() {
@@ -237,6 +211,14 @@ private LazyDataModel<Paso> modeloPaso;
 
     public void setTipos(List<TipoPaso> tipos) {
         this.tipos = tipos;
+    }
+
+    public boolean isEditar() {
+        return editar;
+    }
+
+    public void setEditar(boolean editar) {
+        this.editar = editar;
     }
     
 }
