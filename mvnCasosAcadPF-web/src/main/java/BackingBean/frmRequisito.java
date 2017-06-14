@@ -145,8 +145,8 @@ public class frmRequisito implements Serializable{
     }
     
     public void limpiar(){
-        RequestContext.getCurrentInstance().reset(":tabViewRequisito:edAddRequisito");
-        this.registro=new Requisito();
+    //    RequestContext.getCurrentInstance().reset(":tabViewRequisito:edAddRequisito");
+    //    this.registro=new Requisito();
     }
     
      public Integer getTipoSeleccionado(){
